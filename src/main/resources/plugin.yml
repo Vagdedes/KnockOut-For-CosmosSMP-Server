@@ -4,4 +4,3 @@ main: com.vagdedes.knockout.Register
 version: 1.0.1
 website: https://vagdedes.com
 api-version: 1.13
-load: POSTWORLD
