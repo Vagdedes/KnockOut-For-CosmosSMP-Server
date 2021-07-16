@@ -35,13 +35,13 @@ public class PluginObjects {
                             Player p = Bukkit.getPlayer(playerData.getUUID());
 
                             if (p != null && p.isOnline()) {
-                                if ((currentTime - knockedOutTime) >= 60_000L) { // Death after 60 seconds of not being revived.
+                                if ((currentTime - knockedOutTime) >= 60_000L) { // Death after 60 seconds in milliseconds of not being revived.
                                     playerData.dropItems(p.getLocation());
                                     p.setHealth(0.0);
                                     playerData.setKnockedOut(false); // Always last
                                 } else {
                                     if (p.isSneaking()) {
-                                        if (playerData.increaseSneakingTicks() >= 100) { // Death after sneaking for 5 seconds.
+                                        if (playerData.increaseSneakingTicks() >= 100) { // Death after sneaking for 5 seconds in ticks.
                                             playerData.dropItems(p.getLocation());
                                             p.setHealth(0.0);
                                             playerData.setKnockedOut(false); // Always last
