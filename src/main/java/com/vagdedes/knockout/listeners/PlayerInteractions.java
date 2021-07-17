@@ -9,6 +9,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityPickupItemEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerLevelChangeEvent;
 import org.bukkit.inventory.PlayerInventory;
 
@@ -61,6 +62,15 @@ public class PlayerInteractions implements Listener {
                 playerData.setInventory(playerInventory.getContents());
                 playerData.setArmor(playerInventory.getArmorContents());
             }
+        }
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    private void Interact(PlayerInteractEvent e) {
+        PlayerData playerData = PluginObjects.getPlayerData(e.getPlayer());
+
+        if (playerData.isKnockedOut()) {
+            e.setCancelled(true);
         }
     }
 }
