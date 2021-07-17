@@ -2,7 +2,9 @@ package com.vagdedes.knockout.objects;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.World;
+import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
@@ -14,7 +16,7 @@ public class PlayerData {
     private final UUID uuid;
     private ItemStack[] inventory;
     private ItemStack[] armor;
-    private int exp, sneakingTicks;
+    private int exp, sneakingTicks, blockX, blockZ;
     private long knockedOut;
     private boolean disconnected;
 
@@ -52,6 +54,14 @@ public class PlayerData {
         return knockedOut;
     }
 
+    public int getBlockX() {
+        return blockX;
+    }
+
+    public int getBlockZ() {
+        return blockZ;
+    }
+
     // Logic
 
     public boolean isKnockedOut(long l) {
@@ -82,11 +92,15 @@ public class PlayerData {
         }
     }
 
-    public void setKnockedOut(boolean b) {
-        if (b) {
+    public void setKnockedOut(Location location) {
+        if (location != null) {
             knockedOut = System.currentTimeMillis();
+            blockX = location.getBlockX();
+            blockZ = location.getBlockZ();
         } else {
             knockedOut = 0L;
+            blockX = 0;
+            blockZ = 0;
             resetSneakingTicks();
         }
     }
@@ -102,12 +116,17 @@ public class PlayerData {
             Player player = Bukkit.getPlayer(uuid);
 
             if (player != null && player.isOnline()) {
+                Location blockLocation = player.getLocation().clone().add(0, 1, 0);
+                player.sendBlockChange(blockLocation, blockLocation.getBlock().getBlockData());
+
                 PlayerInventory playerInventory = player.getInventory();
                 playerInventory.setContents(inventory);
                 playerInventory.setArmorContents(armor);
+
                 player.setLevel(exp);
                 player.setHealth(player.getMaxHealth());
-                setKnockedOut(false);
+                player.setWalkSpeed(0.2f);
+                setKnockedOut(null);
                 return true;
             }
         }
@@ -119,10 +138,14 @@ public class PlayerData {
 
         if (world != null) {
             for (ItemStack itemStack : inventory) {
-                world.dropItem(location, itemStack);
+                if (itemStack != null) {
+                    world.dropItem(location, itemStack);
+                }
             }
             for (ItemStack itemStack : armor) {
-                world.dropItem(location, itemStack);
+                if (itemStack != null) {
+                    world.dropItem(location, itemStack);
+                }
             }
             inventory = new ItemStack[]{};
             armor = new ItemStack[]{};

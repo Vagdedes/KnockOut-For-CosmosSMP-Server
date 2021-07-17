@@ -3,6 +3,9 @@ package com.vagdedes.knockout.handlers;
 import com.vagdedes.knockout.Register;
 import com.vagdedes.knockout.objects.PlayerData;
 import org.bukkit.Bukkit;
+import org.bukkit.GameMode;
+import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.PlayerInventory;
 
@@ -35,20 +38,43 @@ public class PluginObjects {
                             Player p = Bukkit.getPlayer(playerData.getUUID());
 
                             if (p != null && p.isOnline()) {
-                                if ((currentTime - knockedOutTime) >= 60_000L) { // Death after 60 seconds in milliseconds of not being revived.
-                                    playerData.dropItems(p.getLocation());
-                                    p.setHealth(0.0);
-                                    playerData.setKnockedOut(false); // Always last
-                                } else {
-                                    if (p.isSneaking()) {
-                                        if (playerData.increaseSneakingTicks() >= 100) { // Death after sneaking for 5 seconds in ticks.
-                                            playerData.dropItems(p.getLocation());
-                                            p.setHealth(0.0);
-                                            playerData.setKnockedOut(false); // Always last
-                                        }
+                                GameMode gameMode = p.getGameMode();
+
+                                if (gameMode == GameMode.SURVIVAL || gameMode == GameMode.ADVENTURE) {
+                                    long timePassed = currentTime - knockedOutTime;
+                                    long maxTimePassed = 60_000L;
+                                    Location blockLocation = p.getLocation().clone().add(0, 1, 0);
+
+                                    if (timePassed >= maxTimePassed) { // Death after 60 seconds in milliseconds of not being revived.
+                                        playerData.dropItems(p.getLocation());
+                                        p.setHealth(0.0);
+                                        p.sendBlockChange(blockLocation, blockLocation.getBlock().getBlockData());
                                     } else {
-                                        playerData.resetSneakingTicks();
+                                        if (p.isSneaking()) {
+                                            double maxTicks = 100;
+                                            double ticksPassed = playerData.increaseSneakingTicks();
+
+                                            if (ticksPassed >= maxTicks) { // Death after sneaking for 5 seconds in ticks.
+                                                playerData.dropItems(p.getLocation());
+                                                p.setHealth(0.0);
+                                                p.sendBlockChange(blockLocation, blockLocation.getBlock().getBlockData());
+                                            } else {
+                                                double health = p.getMaxHealth();
+                                                p.setHealth(Math.min(
+                                                        health - ((health / maxTicks) * ticksPassed),
+                                                        health - ((health / maxTimePassed) * timePassed))
+                                                );
+                                                p.sendBlockChange(blockLocation, Material.BARRIER, (byte) 0);
+                                            }
+                                        } else {
+                                            playerData.resetSneakingTicks();
+                                            double health = p.getMaxHealth();
+                                            p.setHealth(health - ((health / maxTimePassed) * timePassed));
+                                            p.sendBlockChange(blockLocation, Material.BARRIER, (byte) 0);
+                                        }
                                     }
+                                } else {
+                                    playerData.restore();
                                 }
                             } else {
                                 iterator.remove(); // Remove player from loop in rare scenario they are not found to exist or be online.
