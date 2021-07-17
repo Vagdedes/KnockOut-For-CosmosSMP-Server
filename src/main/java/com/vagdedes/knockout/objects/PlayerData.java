@@ -19,11 +19,13 @@ public class PlayerData {
     private int exp, sneakingTicks, blockX, blockZ;
     private long knockedOut;
     private boolean disconnected;
+    private Player player;
 
     // Initiation
 
-    public PlayerData(UUID uuid, ItemStack[] inventory, ItemStack[] armor, int exp) {
-        this.uuid = uuid;
+    public PlayerData(Player player, ItemStack[] inventory, ItemStack[] armor, int exp) {
+        this.player = player;
+        this.uuid = player.getUniqueId();
         this.inventory = inventory;
         this.armor = armor;
         this.exp = exp;
@@ -33,6 +35,10 @@ public class PlayerData {
     }
 
     // Get
+
+    public Player getPlayer() {
+        return player;
+    }
 
     public UUID getUUID() {
         return uuid;
@@ -111,10 +117,8 @@ public class PlayerData {
 
     // Complex
 
-    public boolean restore() {
+    public boolean restore(double health) {
         if (isKnockedOut()) {
-            Player player = Bukkit.getPlayer(uuid);
-
             if (player != null && player.isOnline()) {
                 Location blockLocation = player.getLocation().clone().add(0, 1, 0);
                 player.sendBlockChange(blockLocation, blockLocation.getBlock().getBlockData());
@@ -124,7 +128,7 @@ public class PlayerData {
                 playerInventory.setArmorContents(armor);
 
                 player.setLevel(exp);
-                player.setHealth(player.getMaxHealth());
+                player.setHealth(health);
                 player.setWalkSpeed(0.2f);
                 setKnockedOut(null);
                 return true;

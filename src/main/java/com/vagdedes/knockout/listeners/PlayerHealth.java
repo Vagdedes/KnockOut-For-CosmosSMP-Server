@@ -7,17 +7,20 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityRegainHealthEvent;
+import org.bukkit.event.entity.EntityTargetLivingEntityEvent;
+import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 
-public class PlayerRevival implements Listener {
+public class PlayerHealth implements Listener {
 
-    @EventHandler // Event have no priority or check-up for cancelled scenarios to ensure this critical feature works as expected.
+    @EventHandler
+    // Event have no priority or check-up for cancelled scenarios to ensure this critical feature works as expected.
     public void Interact(PlayerInteractEntityEvent e) {
         if (e.getRightClicked() instanceof Player p) {
             Player t = e.getPlayer();
 
             if (!p.equals(t) && !PluginObjects.getPlayerData(t).isKnockedOut()) {
-                PluginObjects.getPlayerData(p).restore();
+                PluginObjects.getPlayerData(p).restore(1.0);
             }
         }
     }
@@ -33,6 +36,21 @@ public class PlayerRevival implements Listener {
     private void Damage(EntityDamageEvent e) {
         if (e.getEntity() instanceof Player p && PluginObjects.getPlayerData(p).isKnockedOut()) {
             e.setCancelled(true);
+        }
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    private void Food(FoodLevelChangeEvent e) {
+        if (e.getEntity() instanceof Player p && e.getFoodLevel() < p.getFoodLevel() && PluginObjects.getPlayerData(p).isKnockedOut()) {
+            e.setCancelled(true);
+        }
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    public void Target(EntityTargetLivingEntityEvent event) {
+        if (event.getTarget() instanceof Player p && PluginObjects.getPlayerData(p).isKnockedOut()) {
+            event.setCancelled(true);
+            event.setTarget(null);
         }
     }
 }

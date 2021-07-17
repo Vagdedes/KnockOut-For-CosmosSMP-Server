@@ -2,7 +2,7 @@ package com.vagdedes.knockout.listeners;
 
 import com.vagdedes.knockout.handlers.PluginObjects;
 import com.vagdedes.knockout.objects.PlayerData;
-import org.bukkit.GameMode;
+import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -23,10 +23,13 @@ public class PlayerDeath implements Listener {
 
             if (gameMode == GameMode.SURVIVAL || gameMode == GameMode.ADVENTURE) {
                 e.setCancelled(true);
-                playerData.setKnockedOut(p.getLocation()); // Always first
+                Location location = p.getLocation();
+                playerData.setKnockedOut(location); // Always first
+
                 PlayerInventory playerInventory = p.getInventory();
                 playerInventory.clear();
                 playerInventory.setArmorContents(null);
+
                 p.setLevel(0);
                 p.setExp(0.0f);
                 p.setWalkSpeed(0.0f);
@@ -36,6 +39,12 @@ public class PlayerDeath implements Listener {
                 if (p.getAllowFlight()) {
                     p.setFlying(false);
                 }
+                for (Player o : Bukkit.getOnlinePlayers()) {
+                    if (p.equals(o) || o.getLocation().distance(location) <= 32) {
+                        o.playSound(location, Sound.ENTITY_PLAYER_DEATH, 1f, 1f);
+                    }
+                }
+                location.getWorld().spawnParticle(Particle.REDSTONE, location, 16, 0.0, 0.0, 0.0, 0.0);
             } else {
                 p.setWalkSpeed(0.2f);
                 playerData.setKnockedOut(null);

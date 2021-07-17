@@ -18,7 +18,7 @@ public class Register extends JavaPlugin {
         manager.registerEvents(new PlayerMovement(), this);
         manager.registerEvents(new PlayerConnection(), this);
         manager.registerEvents(new PlayerInteractions(), this);
-        manager.registerEvents(new PlayerRevival(), this);
+        manager.registerEvents(new PlayerHealth(), this);
     }
 
     public void onDisable() {

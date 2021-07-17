@@ -35,12 +35,13 @@ public class PluginObjects {
                         long knockedOutTime = playerData.getKnockedOutTime();
 
                         if (playerData.isKnockedOut(knockedOutTime)) {
-                            Player p = Bukkit.getPlayer(playerData.getUUID());
+                            Player p = playerData.getPlayer();
 
                             if (p != null && p.isOnline()) {
                                 GameMode gameMode = p.getGameMode();
 
                                 if (gameMode == GameMode.SURVIVAL || gameMode == GameMode.ADVENTURE) {
+                                    p.setFireTicks(0);
                                     long timePassed = currentTime - knockedOutTime;
                                     long maxTimePassed = 60_000L;
                                     Location blockLocation = p.getLocation().clone().add(0, 1, 0);
@@ -74,7 +75,7 @@ public class PluginObjects {
                                         }
                                     }
                                 } else {
-                                    playerData.restore();
+                                    playerData.restore(p.getMaxHealth());
                                 }
                             } else {
                                 iterator.remove(); // Remove player from loop in rare scenario they are not found to exist or be online.
@@ -92,7 +93,8 @@ public class PluginObjects {
         Iterator<PlayerData> iterator = playerDataSet.iterator();
 
         while (iterator.hasNext()) {
-            iterator.next().restore();
+            PlayerData playerData = iterator.next();
+            playerData.restore(playerData.getPlayer().getMaxHealth());
             iterator.remove();
         }
     }
@@ -109,7 +111,7 @@ public class PluginObjects {
 
     public static PlayerData cachePlayerData(Player p) {
         PlayerInventory playerInventory = p.getInventory();
-        PlayerData playerData = new PlayerData(p.getUniqueId(),
+        PlayerData playerData = new PlayerData(p,
                 playerInventory.getContents(),
                 playerInventory.getArmorContents(),
                 p.getLevel());
