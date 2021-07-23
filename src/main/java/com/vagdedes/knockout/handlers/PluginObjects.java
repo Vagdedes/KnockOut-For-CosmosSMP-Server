@@ -49,7 +49,10 @@ public class PluginObjects {
                                     if (timePassed >= maxTimePassed) { // Death after 60 seconds in milliseconds of not being revived.
                                         playerData.dropItems(p.getLocation());
                                         p.setHealth(0.0);
-                                        p.sendBlockChange(blockLocation, blockLocation.getBlock().getBlockData());
+
+                                        for (Player o : Bukkit.getOnlinePlayers()) {
+                                            o.sendBlockChange(blockLocation, blockLocation.getBlock().getBlockData());
+                                        }
                                     } else {
                                         if (p.isSneaking()) {
                                             double maxTicks = 100;
@@ -58,20 +61,29 @@ public class PluginObjects {
                                             if (ticksPassed >= maxTicks) { // Death after sneaking for 5 seconds in ticks.
                                                 playerData.dropItems(p.getLocation());
                                                 p.setHealth(0.0);
-                                                p.sendBlockChange(blockLocation, blockLocation.getBlock().getBlockData());
+
+                                                for (Player o : Bukkit.getOnlinePlayers()) {
+                                                    o.sendBlockChange(blockLocation, blockLocation.getBlock().getBlockData());
+                                                }
                                             } else {
                                                 double health = p.getMaxHealth();
                                                 p.setHealth(Math.min(
                                                         health - ((health / maxTicks) * ticksPassed),
                                                         health - ((health / maxTimePassed) * timePassed))
                                                 );
-                                                p.sendBlockChange(blockLocation, Material.BARRIER, (byte) 0);
+
+                                                for (Player o : Bukkit.getOnlinePlayers()) {
+                                                    o.sendBlockChange(blockLocation, Material.BARRIER, (byte) 0);
+                                                }
                                             }
                                         } else {
                                             playerData.resetSneakingTicks();
                                             double health = p.getMaxHealth();
                                             p.setHealth(health - ((health / maxTimePassed) * timePassed));
-                                            p.sendBlockChange(blockLocation, Material.BARRIER, (byte) 0);
+
+                                            for (Player o : Bukkit.getOnlinePlayers()) {
+                                                o.sendBlockChange(blockLocation, Material.BARRIER, (byte) 0);
+                                            }
                                         }
                                     }
                                 } else {

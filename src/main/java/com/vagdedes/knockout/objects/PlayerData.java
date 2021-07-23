@@ -121,7 +121,10 @@ public class PlayerData {
         if (isKnockedOut()) {
             if (player != null && player.isOnline()) {
                 Location blockLocation = player.getLocation().clone().add(0, 1, 0);
-                player.sendBlockChange(blockLocation, blockLocation.getBlock().getBlockData());
+
+                for (Player o : Bukkit.getOnlinePlayers()) {
+                    o.sendBlockChange(blockLocation, blockLocation.getBlock().getBlockData());
+                }
 
                 PlayerInventory playerInventory = player.getInventory();
                 playerInventory.setContents(inventory);
