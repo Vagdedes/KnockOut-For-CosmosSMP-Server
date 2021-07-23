@@ -44,7 +44,7 @@ public class PlayerDeath implements Listener {
                         o.playSound(location, Sound.ENTITY_PLAYER_DEATH, 1f, 1f);
                     }
                 }
-                location.getWorld().spawnParticle(Particle.REDSTONE, location, 16, 0.0, 0.0, 0.0, 0.0);
+                //location.getWorld().spawnParticle(Particle.REDSTONE, location, 16, 0.0, 0.0, 0.0, 0.0);
             } else {
                 p.setWalkSpeed(0.2f);
                 playerData.setKnockedOut(null);
