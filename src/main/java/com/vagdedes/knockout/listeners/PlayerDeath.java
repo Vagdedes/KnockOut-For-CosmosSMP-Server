@@ -44,6 +44,7 @@ public class PlayerDeath implements Listener {
                         o.playSound(location, Sound.ENTITY_PLAYER_DEATH, 1f, 1f);
                     }
                 }
+                Bukkit.broadcastMessage(p.getName() + " ")
                 //location.getWorld().spawnParticle(Particle.REDSTONE, location, 16, 0.0, 0.0, 0.0, 0.0);
             } else {
                 p.setWalkSpeed(0.2f);

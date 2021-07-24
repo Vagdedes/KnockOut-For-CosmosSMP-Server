@@ -21,6 +21,8 @@ public class PlayerHealth implements Listener {
 
             if (!p.equals(t) && !PluginObjects.getPlayerData(t).isKnockedOut()) {
                 PluginObjects.getPlayerData(p).restore(1.0);
+                t.sendMessage("You revived " + p.getName());
+                p.sendMessage("You were revived by " + t.getName());
             }
         }
     }
