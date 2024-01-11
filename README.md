@@ -1,0 +1,1 @@
+Knock-out Minecraft feature. Puts you in a gliding state when you die, where you have 60 seconds to be revived by a player by having them click you. Alternatively, you can shift/sneak for 5 seconds to die prematurely.
